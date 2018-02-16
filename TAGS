@@ -30,14 +30,79 @@ sitemapSite sitemapSite100,101
 main main102,103
 main main103,104
 
-./src/DB/Main.hs,130
-data TestField TestField7,8
-data TestField = TestField TestField7,8
-instance instance9,10
-main main15,16
-main main16,17
+./src/DB/Main.hs,332
+data WeatherField WeatherField13,14
+data WeatherField = WeatherField WeatherField13,14
+instance instance15,16
+main main21,22
+main main22,23
+populateDB populateDB35,36
+makeFile makeFile43,44
+writeToFile writeToFile50,51
+writeToFile writeToFile51,52
+showDateTime showDateTime57,58
+showDateTime showDateTime58,59
 
-./src/WebService/Main.hs,445
+./src/WebService/Main.hs,892
+module Main Main1,2
+data WeatherField WeatherField22,23
+data WeatherField = WeatherField WeatherField22,23
+instance instance24,25
+show show30,31
+show show31,32
+data SitemapSitemap33,34
+    = HomeHome34,35
+    | Date Date35,36
+    | Range Range36,37
+    | Plus Plus37,38
+toJSON toJSON42,43
+siteRoute siteRoute44,45
+siteRoute siteRoute45,46
+siteLayout siteLayout52,53
+siteLayout siteLayout53,54
+<html><html>55,56
+stylesheet stylesheet64,65
+convRender convRender74,75
+convRender convRender76,77
+renderFunction renderFunction78,79
+renderFunction renderFunction79,80
+appRoot appRoot81,82
+plusHandler plusHandler90,91
+dayHandler dayHandler97,98
+dayHandler dayHandler98,99
+rangeHandler rangeHandler109,110
+rangeHandler rangeHandler110,111
+sitemapSite sitemapSite120,121
+sitemapSite sitemapSite121,122
+main main123,124
+main main124,125
+
+./src/WebService/MWE.hs,658
+module Main Main1,2
+data WeatherField WeatherField20,21
+data WeatherField = WeatherField WeatherField20,21
+instance instance22,23
+show show28,29
+show show29,30
+data SitemapSitemap31,32
+    = HomeHome32,33
+    | DayQuery DayQuery33,34
+siteRoute siteRoute37,38
+siteRoute siteRoute38,39
+convRender convRender43,44
+convRender convRender45,46
+renderFunction renderFunction47,48
+renderFunction renderFunction48,49
+appRoot appRoot50,51
+appRoot appRoot51,52
+dayQueryHandler dayQueryHandler57,58
+dayQueryHandler dayQueryHandler58,59
+sitemapSite sitemapSite66,67
+sitemapSite sitemapSite67,68
+main main69,70
+main main70,71
+
+./src/WebService/Example.hs,445
 module Main Main0,1
 initDb initDb17,18
 initDb initDb18,19

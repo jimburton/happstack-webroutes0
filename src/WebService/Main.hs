@@ -1,94 +1,135 @@
+{-# LANGUAGE OverloadedStrings, FlexibleContexts, TypeFamilies, QuasiQuotes, TemplateHaskell, DeriveGeneric #-}
 module Main where
 
-import Control.Monad    (msum)
-import Data.Char        (toLower)
-import Happstack.Server (FromReqURI(..), dirs, dir, path, seeOther, nullConf, simpleHTTP, toResponse, ok)
-import Control.Monad.Trans
-import Control.Monad
-import System.IO
-import Database.HDBC
-import Database.HDBC.MySQL
+import Prelude hiding    (reverse, show)
+import Control.Monad     (liftM, msum)
+import Control.Monad.IO.Class (liftIO)
+import Data.List         (sort)
+import Data.Text         (Text, pack, unpack, reverse, toUpper)
+import Happstack.Server
+import Text.Hamlet
+import Text.Lucius
+import Web.Routes
+import Web.Routes.Happstack
+import Web.Routes.TH
+import           Database.SQLite.Simple
+import           Database.SQLite.Simple.FromRow
+import Data.Dates
 import qualified Data.Text as T
+import qualified Prelude as P
 import Data.Aeson
-import qualified Data.ByteString.Lazy.Char8 as BL
-import qualified Database.SQLite.Simple           as S
+import GHC.Generics (Generic )
 
----------sqlite in-memory version -------------------
--- | Create database schema - we use in-memory database
-initDb :: S.Connection -> IO S.Connection
-initDb c = do
-    S.execute_ c "create table post_code (address text, code int)"
-    S.execute_ c "insert into post_code (address, code) values ('Grafton','x1010')"
-    return c
+data WeatherField = WeatherField T.Text Float deriving (Generic, Eq, Show)
 
--- | Handler - finds postcode for known addresses
-hFind :: Handler App App ()
-hFind = do
-    address <- fromJust <$> getParam "address"
-    addr <- fromBS $ address
-    r <- query "select cast(code as text) from post_code where address = ?" (addr :: Address) :: Handler App App [Postcode]
-    writeText $ (TX.pack . show) r
+instance FromRow WeatherField where
+  fromRow = WeatherField <$> field <*> field 
 
------------------------------------------------------
-{- 
-Write a web service that allows people to get weather data for
+instance ToRow WeatherField where
+  toRow (WeatherField theDate temp) = toRow (theDate, temp)
 
-+ a single day
-+ a date range FROM TO -- full data or averages
+show :: Show a => a -> Text
+show = pack . P.show
 
-/weatherAPI/query/YYYY-mm-dd
-/weatherAPI/query/range/YYYY-mm-dd/YYYY-mm-dd/
+data Sitemap
+    = Home
+    | Date Text
+    | Range Text Text
+    | Plus Int Int
 
-and PUT data for a new day
+$(derivePathInfo ''Sitemap)
 
-Write some tests using http-test
+instance ToJSON WeatherField where
+toJSON (WeatherField d t) = object [ (T.pack "date") .= d, (T.pack "temperature") .= t ]
 
-import Test.HTTP
-import Data.List (isInfixOf)
+siteRoute :: Connection -> Sitemap -> RouteT Sitemap (ServerPartT IO) Response
+siteRoute conn url = 
+    case url of
+        Home             -> appRoot
+        (Date d)         -> dayHandler d conn 
+        (Range d1 d2)    -> rangeHandler d1 d2 conn 
+        (Plus i1 i2)     -> plusHandler i1 i2
 
-main = defaultMain $ httpTestCase "BayesHive landing page" "https://bayeshive.com" $ do
-    landing <- get "/"
-    assert "Correct blog link" $
-      "href=\"https://bayeshive.com/blog\"" `isInfixOf` landing
-    loginResult <- postForm "/auth/page/email/login"
-                     [("email", "foo"), ("password", "bar")]
-    debug loginResult
+siteLayout :: HtmlUrl Sitemap -> HtmlUrl Sitemap
+siteLayout body = [hamlet|
+$doctype 5
+<html>
+  <head>
+    <link href="/site.css" rel="stylesheet" media="all" type="text/css">
+  <body>
+    <div class="container">
+      ^{body}
+      <p><a href=@{Home}>Home</a>
+|]
 
--}
--- Representation of a person with firstname/lastname
-data PersonName = 
-     PersonName { firstName :: String
-                , lastName  :: String
-                } deriving (Eq, Show)
+stylesheet = [lucius|
+body {
+    background: #EBEBEB;
+    height: 100%;
+}
+.container {
+    padding: 20px;
+}
+|] undefined -- no URL rendering in this css
 
--- Converts SQL row into PersonName data
-intoPersonName :: [SqlValue] -> PersonName
-intoPersonName [firstName, lastName] =
-    PersonName first last
-    where first = (fromSql firstName) :: String
-          last  = (fromSql lastName) :: String
+convRender :: (url -> [(Text, Maybe Text)] -> Text)
+           -> (url -> [(Text, Text)]-> Text)
+convRender maybeF url params = maybeF url $ map (\(t1, t2) -> (t1, Just t2)) params
 
--- Converts PersonName data into JSON
-instance ToJSON PersonName where
-    toJSON (PersonName fn ln) = object [ (T.pack "firstname") .= fn, (T.pack "lastname") .= ln ]
+renderFunction :: MonadRoute m => m (URL m -> [(Text, Text)] -> Text)
+renderFunction = fmap convRender askRouteFn
 
--- Extract one row from the database and converts it into JSON string
-getFromDb :: Connection -> IO String
-getFromDb conn = do 
-    rows <- quickQuery' conn "SELECT * from persons" []
-    let reply3 = head $ map intoPersonName rows
-    return (BL.unpack $ encode reply3)
+appRoot = do
+    urlF <- renderFunction
+    ok $ toResponse $ siteLayout ([hamlet|
+    <p>Small demo application for Happstack, web-routes, Hamlet and Lucius.
+    <p>Add two numbers by going to /plus/int1/int2, e.g. 
+        <a href=@{Plus 13 37}> here.
+    <p>Also other boring stuff.
+    |]) urlF
 
--- Fires up a happstack server and connects to a local MySQL server
-main :: IO ()
+plusHandler n1 n2 = do 
+    urlF <- renderFunction
+    ok $ toResponse $ siteLayout ([hamlet|
+    <p>Input numbers are #{n1} and #{n2}
+    <p>Sum is: #{n1 + n2}
+    |]) urlF
+
+dayHandler :: Text -> Connection -> RouteT Sitemap (ServerPartT IO) Response
+dayHandler d conn = do
+  liftIO $ putStrLn ("Looking for: " ++ P.show d)
+  urlF <- renderFunction
+  r <- liftIO $ (queryNamed conn "SELECT the_date, temperature FROM weather WHERE the_date = :dt" [":dt" := d] :: IO [WeatherField])
+  liftIO (putStrLn (P.show r))
+  let res = if null r then "NO DATA" else show $ head r
+  ok $ toResponse $ siteLayout ([hamlet|
+    #{d}
+    #{res}
+    |]) urlF
+
+rangeHandler :: Text -> Text -> Connection -> RouteT Sitemap (ServerPartT IO) Response
+rangeHandler d1 d2 conn = do
+  liftIO $ putStrLn ("Looking for: " ++ P.show d1 ++ "/" ++ P.show d2)
+  urlF <- renderFunction
+  r <- liftIO (queryNamed conn "SELECT the_date, temperature FROM weather WHERE the_date >= :d1 AND the_date <= :d2"
+       [":d1" := d1, ":d2" := d2] :: IO [WeatherField])
+  let res = if null r then "NO DATA" else show r
+  ok $ toResponse $ siteLayout ([hamlet|
+    #{res}
+    |]) urlF
+    
+sitemapSite :: Connection -> Site Sitemap (ServerPartT IO Response)
+sitemapSite conn = setDefault Home $ mkSitePI (runRouteT (siteRoute conn)) 
+
+main :: IO()
 main = do
-    conn <- connectMySQL defaultMySQLConnectInfo {
-        mysqlUser     = "testing",
-        mysqlPassword = "testing1234",
-        mysqlDatabase = "test"
-    }
-    str <- (getFromDb conn)
-    simpleHTTP nullConf $ 
-        msum [ dirs "db" $ ok str 
-        , seeOther "db" "db"
-        ]
+    conn <- open "data/np-weather.db"
+    r <- query_ conn "SELECT the_date, temperature FROM weather" :: IO [WeatherField]
+    mapM_ (\x -> putStrLn $ P.show x) r
+    simpleHTTP nullConf $ msum [
+      do dirs "site.css" nullDir
+         setHeaderM "Content-Type" "text/css"
+         ok $ toResponse $ renderCss stylesheet
+      , implSite "http://localhost:8000" "/site" (sitemapSite conn)
+      , seeOther ("/site" :: String) (toResponse ())
+      ]

@@ -6,3 +6,4 @@ $ cabal update
 $ cabal sandbox init
 $ cabal configure
 $ cabal install
+$ runhaskell src/DB/Main.hs #set up the db
