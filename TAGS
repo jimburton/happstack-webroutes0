@@ -30,5 +30,30 @@ sitemapSite sitemapSite100,101
 main main102,103
 main main103,104
 
+./src/DB/Main.hs,130
+data TestField TestField7,8
+data TestField = TestField TestField7,8
+instance instance9,10
+main main15,16
+main main16,17
+
+./src/WebService/Main.hs,445
+module Main Main0,1
+initDb initDb17,18
+initDb initDb18,19
+hFind hFind24,25
+hFind hFind25,26
+data PersonName PersonName58,59
+     PersonName PersonName59,60
+     PersonName { firstName firstName59,60
+                , lastName lastName60,61
+intoPersonName intoPersonName64,65
+intoPersonName intoPersonName65,66
+instance instance71,72
+getFromDb getFromDb75,76
+getFromDb getFromDb76,77
+main main82,83
+main main83,84
+
 ./Setup.hs,15
 main main1,2
