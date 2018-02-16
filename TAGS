@@ -43,39 +43,40 @@ writeToFile writeToFile51,52
 showDateTime showDateTime57,58
 showDateTime showDateTime58,59
 
-./src/WebService/Main.hs,892
+./src/WebService/Main.hs,1006
 module Main Main1,2
-data WeatherField WeatherField22,23
-data WeatherField = WeatherField WeatherField22,23
-instance instance24,25
-show show30,31
-show show31,32
-data SitemapSitemap33,34
-    = HomeHome34,35
-    | Date Date35,36
-    | Range Range36,37
-    | Plus Plus37,38
-toJSON toJSON42,43
-siteRoute siteRoute44,45
-siteRoute siteRoute45,46
-siteLayout siteLayout52,53
-siteLayout siteLayout53,54
-<html><html>55,56
-stylesheet stylesheet64,65
-convRender convRender74,75
+data WeatherField WeatherField24,25
+data WeatherField = WeatherField WeatherField24,25
+data WeatherField = WeatherField {date date24,25
+data WeatherField = WeatherField {date :: T.Text, temperature temperature24,25
+instance instance26,27
+show show35,36
+show show36,37
+data SitemapSitemap38,39
+    = HomeHome39,40
+    | Date Date40,41
+    | Range Range41,42
+    | Plus Plus42,43
+siteRoute siteRoute46,47
+siteRoute siteRoute47,48
+siteLayout siteLayout54,55
+siteLayout siteLayout55,56
+<html><html>57,58
+stylesheet stylesheet66,67
 convRender convRender76,77
-renderFunction renderFunction78,79
-renderFunction renderFunction79,80
-appRoot appRoot81,82
-plusHandler plusHandler90,91
-dayHandler dayHandler97,98
-dayHandler dayHandler98,99
-rangeHandler rangeHandler109,110
+convRender convRender78,79
+renderFunction renderFunction80,81
+renderFunction renderFunction81,82
+appRoot appRoot83,84
+plusHandler plusHandler92,93
+dayHandler dayHandler99,100
+dayHandler dayHandler100,101
 rangeHandler rangeHandler110,111
-sitemapSite sitemapSite120,121
+rangeHandler rangeHandler111,112
 sitemapSite sitemapSite121,122
-main main123,124
+sitemapSite sitemapSite122,123
 main main124,125
+main main125,126
 
 ./src/WebService/MWE.hs,658
 module Main Main1,2

@@ -19,14 +19,19 @@ import qualified Data.Text as T
 import qualified Prelude as P
 import Data.Aeson
 import GHC.Generics (Generic )
+import qualified Data.ByteString.Lazy as LB
+import qualified Data.ByteString.Lazy.Char8 as BC
 
-data WeatherField = WeatherField T.Text Float deriving (Generic, Eq, Show)
+data WeatherField = WeatherField {date :: T.Text, temperature :: Float} deriving (Generic, Eq, Show)
 
 instance FromRow WeatherField where
   fromRow = WeatherField <$> field <*> field 
 
 instance ToRow WeatherField where
   toRow (WeatherField theDate temp) = toRow (theDate, temp)
+
+instance ToJSON   WeatherField
+instance FromJSON WeatherField
 
 show :: Show a => a -> Text
 show = pack . P.show
@@ -38,9 +43,6 @@ data Sitemap
     | Plus Int Int
 
 $(derivePathInfo ''Sitemap)
-
-instance ToJSON WeatherField where
-toJSON (WeatherField d t) = object [ (T.pack "date") .= d, (T.pack "temperature") .= t ]
 
 siteRoute :: Connection -> Sitemap -> RouteT Sitemap (ServerPartT IO) Response
 siteRoute conn url = 
@@ -100,10 +102,9 @@ dayHandler d conn = do
   liftIO $ putStrLn ("Looking for: " ++ P.show d)
   urlF <- renderFunction
   r <- liftIO $ (queryNamed conn "SELECT the_date, temperature FROM weather WHERE the_date = :dt" [":dt" := d] :: IO [WeatherField])
-  liftIO (putStrLn (P.show r))
-  let res = if null r then "NO DATA" else show $ head r
+  liftIO (putStrLn (BC.unpack $ Data.Aeson.encode r))
+  let res = if null r then "NO DATA" else BC.unpack $ Data.Aeson.encode $ head r
   ok $ toResponse $ siteLayout ([hamlet|
-    #{d}
     #{res}
     |]) urlF
 
@@ -113,7 +114,7 @@ rangeHandler d1 d2 conn = do
   urlF <- renderFunction
   r <- liftIO (queryNamed conn "SELECT the_date, temperature FROM weather WHERE the_date >= :d1 AND the_date <= :d2"
        [":d1" := d1, ":d2" := d2] :: IO [WeatherField])
-  let res = if null r then "NO DATA" else show r
+  let res = if null r then "NO DATA" else concat (map (BC.unpack . Data.Aeson.encode) r)
   ok $ toResponse $ siteLayout ([hamlet|
     #{res}
     |]) urlF
