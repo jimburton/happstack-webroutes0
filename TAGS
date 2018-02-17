@@ -52,7 +52,7 @@ writeToFile writeToFile51,52
 showDateTime showDateTime57,58
 showDateTime showDateTime58,59
 
-./src/WebService/Main.hs,964
+./src/WebService/Main.hs,894
 module Main Main1,2
 data WeatherField WeatherField23,24
 data WeatherField = WeatherField WeatherField23,24
@@ -70,16 +70,14 @@ insertHandler insertHandler63,64
 insertHandler insertHandler64,65
 updateHandler updateHandler70,71
 updateHandler updateHandler71,72
-rangeHandler rangeHandler76,77
-rangeHandler rangeHandler77,78
-notFoundHandler notFoundHandler89,90
-notFoundHandler notFoundHandler90,91
---emptyJSONObject --emptyJSONObject93,94
-emptyJSONResponse emptyJSONResponse94,95
-listToOutput listToOutput97,98
-listToOutput listToOutput98,99
-main main102,103
-main main103,104
+notFoundHandler notFoundHandler76,77
+notFoundHandler notFoundHandler77,78
+--emptyJSONObject --emptyJSONObject80,81
+emptyJSONResponse emptyJSONResponse81,82
+listToOutput listToOutput84,85
+listToOutput listToOutput85,86
+main main89,90
+main main90,91
 
 ./src/WebService/MWE.hs,658
 module Main Main1,2

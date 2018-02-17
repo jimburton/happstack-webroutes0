@@ -73,19 +73,6 @@ updateHandler d t conn = do
   liftIO (execute conn "UPDATE weather SET temperature = ? WHERE the_date = ?" (Only t))
   ok $ emptyJSONResponse
 
-{-| Handle requests for a date range. -}
-rangeHandler :: Text -> Text -> Connection -> ServerPart Response
-rangeHandler d1 d2 conn = do
-  r <- liftIO (queryNamed conn "SELECT the_date, temperature \
-                              \ FROM   weather \
-                              \ WHERE  the_date >= :d1 \
-                              \ AND    the_date <= :d2"
-       [":d1" := d1, ":d2" := d2] :: IO [WeatherField])
-  liftIO $ debugM "Range Query" (listToOutput r)
-  case r of
-    [] -> notFoundHandler
-    _  -> ok $ toResponse (listToOutput r)
-
 {-| Return 404 Not Found and an empty JSON object -}
 notFoundHandler :: ServerPart Response
 notFoundHandler = notFound $ emptyJSONResponse
@@ -111,5 +98,4 @@ main = do
                                path $ \d -> dayHandler d conn
       , dirs "weather/date" $ do method PUT
                                  path $ \d -> path $ \t -> dayPutHandler d t conn
-      , dirs "weather/range" $ path $ \d1 -> path $ \d2 -> rangeHandler d1 d2 conn
-         ]
+      ]
