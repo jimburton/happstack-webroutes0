@@ -43,7 +43,7 @@ writeToFile writeToFile51,52
 showDateTime showDateTime57,58
 showDateTime showDateTime58,59
 
-./src/WebService/Main.hs,851
+./src/WebService/Main.hs,850
 module Main Main1,2
 data WeatherField WeatherField24,25
 data WeatherField = WeatherField WeatherField24,25
@@ -66,12 +66,12 @@ appRoot appRoot59,60
 <html><html>63,64
 dayHandler dayHandler71,72
 dayHandler dayHandler72,73
-rangeHandler rangeHandler82,83
-rangeHandler rangeHandler83,84
-sitemapSite sitemapSite95,96
-sitemapSite sitemapSite96,97
-main main98,99
-main main99,100
+rangeHandler rangeHandler79,80
+rangeHandler rangeHandler80,81
+sitemapSite sitemapSite89,90
+sitemapSite sitemapSite90,91
+main main92,93
+main main93,94
 
 ./src/WebService/MWE.hs,658
 module Main Main1,2

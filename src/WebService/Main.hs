@@ -71,27 +71,21 @@ $doctype 5
 
 dayHandler :: Text -> Connection -> RouteT Sitemap (ServerPartT IO) Response
 dayHandler d conn = do
-  urlF <- renderFunction
   r <- liftIO $ (queryNamed conn "SELECT the_date, temperature \
                                 \ FROM weather \
                                 \ WHERE the_date = :dt" [":dt" := d] :: IO [WeatherField])
   let res = if null r then "NO DATA" else BC.unpack $ Data.Aeson.encode $ head r
-  ok $ toResponse $ ([hamlet|
-    #{res}
-    |]) urlF
+  ok $ toResponse res
 
 rangeHandler :: Text -> Text -> Connection -> RouteT Sitemap (ServerPartT IO) Response
 rangeHandler d1 d2 conn = do
-  urlF <- renderFunction
   r <- liftIO (queryNamed conn "SELECT the_date, temperature \
                               \ FROM weather \
                               \ WHERE the_date >= :d1 \
                               \ AND the_date <= :d2"
        [":d1" := d1, ":d2" := d2] :: IO [WeatherField])
   let res = if null r then "NO DATA" else concat (map (BC.unpack . Data.Aeson.encode) r)
-  ok $ toResponse $ ([hamlet|
-    #{res}
-    |]) urlF
+  ok $ toResponse res
     
 sitemapSite :: Connection -> Site Sitemap (ServerPartT IO Response)
 sitemapSite conn = setDefault Home $ mkSitePI (runRouteT (siteRoute conn)) 
