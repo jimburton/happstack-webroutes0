@@ -10,7 +10,6 @@ import           Web.Routes.Happstack
 import           Web.Routes.TH
 import           Database.SQLite.Simple
 import           Database.SQLite.Simple.FromRow
-import           Data.Dates
 import           Data.Aeson
 import           GHC.Generics                  (Generic)
 import qualified Data.ByteString.Lazy.Char8 as BC

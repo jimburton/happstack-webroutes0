@@ -45,26 +45,26 @@ showDateTime showDateTime58,59
 
 ./src/WebService/Main.hs,702
 module Main Main1,2
-data WeatherField WeatherField17,18
-data WeatherField = WeatherField WeatherField17,18
-data WeatherField = WeatherField {date date17,18
-data WeatherField = WeatherField {date :: Text, temperature temperature17,18
-instance instance20,21
-data Sitemap Sitemap29,30
-data Sitemap = Date Date29,30
-             | Range Range30,31
+data WeatherField WeatherField16,17
+data WeatherField = WeatherField WeatherField16,17
+data WeatherField = WeatherField {date date16,17
+data WeatherField = WeatherField {date :: Text, temperature temperature16,17
+instance instance19,20
+data Sitemap Sitemap28,29
+data Sitemap = Date Date28,29
+             | Range Range29,30
+siteRoute siteRoute33,34
 siteRoute siteRoute34,35
-siteRoute siteRoute35,36
+dayHandler dayHandler39,40
 dayHandler dayHandler40,41
-dayHandler dayHandler41,42
+rangeHandler rangeHandler46,47
 rangeHandler rangeHandler47,48
-rangeHandler rangeHandler48,49
+listToOutput listToOutput55,56
 listToOutput listToOutput56,57
-listToOutput listToOutput57,58
+sitemapSite sitemapSite58,59
 sitemapSite sitemapSite59,60
-sitemapSite sitemapSite60,61
+main main61,62
 main main62,63
-main main63,64
 
 ./src/WebService/MWE.hs,658
 module Main Main1,2
