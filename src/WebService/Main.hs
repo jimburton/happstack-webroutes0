@@ -1,6 +1,11 @@
 {-# LANGUAGE OverloadedStrings, FlexibleContexts, TypeFamilies, QuasiQuotes, TemplateHaskell, DeriveGeneric #-}
 module Main where
 
+import           System.Log.Logger ( updateGlobalLogger
+                                   , rootLoggerName
+                                   , setLevel
+                                   , Priority(..)
+                                   )
 import           Control.Monad.IO.Class (liftIO)
 import           Data.List         (intercalate)
 import           Data.Text         (Text)
@@ -68,7 +73,8 @@ sitemapSite conn = mkSitePI (runRouteT (siteRoute conn))
 routing function. -}
 main :: IO()
 main = do
-    conn <- open "data/np-weather.db"
-    simpleHTTP nullConf $
+  updateGlobalLogger rootLoggerName (setLevel INFO)
+  conn <- open "data/np-weather.db"
+  simpleHTTP nullConf $
       implSite "http://localhost:8000" "/weather" (sitemapSite conn)
       
