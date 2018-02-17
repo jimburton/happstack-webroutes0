@@ -10,7 +10,7 @@ import           System.Log.Logger ( updateGlobalLogger
 import           Control.Monad.IO.Class (liftIO)
 import           Control.Monad          (msum)
 import           Data.List         (intercalate)
-import           Data.Text         (Text, pack)
+import           Data.Text         (Text, pack, unpack)
 import           Happstack.Server  
 import           Web.Routes        
 import           Web.Routes.Happstack (implSite)
@@ -47,6 +47,10 @@ dayHandler d conn = do
   liftIO $ debugM "Date Query" (listToOutput r)
   ok $ toResponse (listToOutput r)
 
+{-| Handle PUT reuests for date/temperature pairs. -}
+dayPutHandler :: Text -> Text -> Connection -> ServerPart Response
+dayPutHandler d t conn = undefined
+
 {-| Handle requests for a date range. -}
 rangeHandler :: Text -> Text -> Connection -> ServerPart Response
 rangeHandler d1 d2 conn = do
@@ -71,6 +75,9 @@ main = do
   simpleHTTP nullConf $  do
     setHeaderM "Content-Type" "application/json"
     msum [
-      dirs "weather/date" $ path $ \d -> dayHandler d conn
+      dirs "weather/date" $ do method [GET, POST]
+                               path $ \d -> dayHandler d conn
+      , dirs "weather/date" $ do method PUT
+                                 path $ \d -> path $ \t -> dayPutHandler d t conn
       , dirs "weather/range" $ path $ \d1 -> path $ \d2 -> rangeHandler d1 d2 conn
          ]

@@ -52,7 +52,7 @@ writeToFile writeToFile51,52
 showDateTime showDateTime57,58
 showDateTime showDateTime58,59
 
-./src/WebService/Main.hs,586
+./src/WebService/Main.hs,656
 module Main Main1,2
 data WeatherField WeatherField23,24
 data WeatherField = WeatherField WeatherField23,24
@@ -64,12 +64,14 @@ data Sitemap = Date Date35,36
              | Range Range36,37
 dayHandler dayHandler41,42
 dayHandler dayHandler42,43
-rangeHandler rangeHandler50,51
-rangeHandler rangeHandler51,52
-listToOutput listToOutput61,62
-listToOutput listToOutput62,63
-main main66,67
-main main67,68
+dayPutHandler dayPutHandler50,51
+dayPutHandler dayPutHandler51,52
+rangeHandler rangeHandler54,55
+rangeHandler rangeHandler55,56
+listToOutput listToOutput65,66
+listToOutput listToOutput66,67
+main main70,71
+main main71,72
 
 ./src/WebService/MWE.hs,658
 module Main Main1,2
