@@ -45,11 +45,33 @@ dayHandler d conn = do
                                \ FROM  weather \
                                \ WHERE the_date = :dt" [":dt" := d] :: IO [WeatherField])
   liftIO $ debugM "Date Query" (listToOutput r)
-  ok $ toResponse (listToOutput r)
+  case r of
+    [] -> notFoundHandler
+    _  -> ok $ toResponse (listToOutput r)
 
 {-| Handle PUT reuests for date/temperature pairs. -}
 dayPutHandler :: Text -> Text -> Connection -> ServerPart Response
-dayPutHandler d t conn = undefined
+dayPutHandler d t conn = do
+  r <- liftIO (queryNamed conn "SELECT the_date, temperature \
+                               \ FROM  weather \
+                               \ WHERE the_date = :dt" [":dt" := d] :: IO [WeatherField])
+  liftIO $ debugM "Date PUT request" (listToOutput r)
+  case r of
+    [] -> insertHandler d t conn
+    _  -> updateHandler d t conn
+
+{-| Insert a new date/temperature pair. -}
+insertHandler :: Text -> Text -> Connection -> ServerPart Response
+insertHandler d t conn = do
+  let t' = (read $ unpack t)::Float
+  liftIO (execute conn "INSERT INTO weather (the_date, temperature) VALUES (?,?)" (WeatherField d t'))
+  ok $ emptyJSONResponse
+
+{-| Update a date/temperature pair. -}
+updateHandler :: Text -> Text -> Connection -> ServerPart Response
+updateHandler d t conn = do
+  liftIO (execute conn "UPDATE weather SET temperature = ? WHERE the_date = ?" (Only t))
+  ok $ emptyJSONResponse
 
 {-| Handle requests for a date range. -}
 rangeHandler :: Text -> Text -> Connection -> ServerPart Response
@@ -60,7 +82,17 @@ rangeHandler d1 d2 conn = do
                               \ AND    the_date <= :d2"
        [":d1" := d1, ":d2" := d2] :: IO [WeatherField])
   liftIO $ debugM "Range Query" (listToOutput r)
-  ok $ toResponse (listToOutput r)
+  case r of
+    [] -> notFoundHandler
+    _  -> ok $ toResponse (listToOutput r)
+
+{-| Return 404 Not Found and an empty JSON object -}
+notFoundHandler :: ServerPart Response
+notFoundHandler = notFound $ emptyJSONResponse
+
+{-| An empty JSON object -}
+--emptyJSONObject :: ServerPart Response
+emptyJSONResponse = toResponse (pack "[]")
 
 {-| Turn a list of WeatherFields into a JSON object. -}
 listToOutput :: ToJSON a => [a] -> String
