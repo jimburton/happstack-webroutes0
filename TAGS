@@ -1,4 +1,13 @@
 
+./tests/WebService/Main.hs,156
+module Main Main0,1
+url url6,7
+day0 day08,9
+testDayQuery testDayQuery10,11
+testRangeQuery testRangeQuery15,16
+tests tests20,21
+main main22,23
+
 ./src/Main.hs,824
 module Main Main1,2
 show show16,17
