@@ -53,18 +53,18 @@ instance instance19,20
 data Sitemap Sitemap28,29
 data Sitemap = Date Date28,29
              | Range Range29,30
-siteRoute siteRoute33,34
 siteRoute siteRoute34,35
-dayHandler dayHandler39,40
-dayHandler dayHandler40,41
-rangeHandler rangeHandler46,47
-rangeHandler rangeHandler47,48
-listToOutput listToOutput55,56
-listToOutput listToOutput56,57
-sitemapSite sitemapSite58,59
-sitemapSite sitemapSite59,60
-main main61,62
-main main62,63
+siteRoute siteRoute35,36
+dayHandler dayHandler41,42
+dayHandler dayHandler42,43
+rangeHandler rangeHandler49,50
+rangeHandler rangeHandler50,51
+listToOutput listToOutput59,60
+listToOutput listToOutput60,61
+sitemapSite sitemapSite63,64
+sitemapSite sitemapSite64,65
+main main68,69
+main main69,70
 
 ./src/WebService/MWE.hs,658
 module Main Main1,2

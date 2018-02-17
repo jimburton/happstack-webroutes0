@@ -31,34 +31,41 @@ data Sitemap = Date Text
 
 $(derivePathInfo ''Sitemap)
 
+{-| Translate a URL into a Response. -}
 siteRoute :: Connection -> Sitemap -> RouteT Sitemap (ServerPartT IO) Response
 siteRoute conn url = 
     case url of
         (Date d)      -> dayHandler d conn 
         (Range d1 d2) -> rangeHandler d1 d2 conn 
 
+{-| Handle reuests for a single date. -}
 dayHandler :: Text -> Connection -> RouteT Sitemap (ServerPartT IO) Response
 dayHandler d conn = do
   r <- liftIO (queryNamed conn "SELECT the_date, temperature \
-                               \ FROM weather \
+                               \ FROM  weather \
                                \ WHERE the_date = :dt" [":dt" := d] :: IO [WeatherField])
   ok $ toResponse (listToOutput r)
 
+{-| Handle requests for a date range. -}
 rangeHandler :: Text -> Text -> Connection -> RouteT Sitemap (ServerPartT IO) Response
 rangeHandler d1 d2 conn = do
   r <- liftIO (queryNamed conn "SELECT the_date, temperature \
-                              \ FROM weather \
-                              \ WHERE the_date >= :d1 \
-                              \ AND the_date <= :d2"
+                              \ FROM   weather \
+                              \ WHERE  the_date >= :d1 \
+                              \ AND    the_date <= :d2"
        [":d1" := d1, ":d2" := d2] :: IO [WeatherField])
   ok $ toResponse (listToOutput r)
 
+{-| Turn a list of WeatherFields into a JSON object. -}
 listToOutput :: ToJSON a => [a] -> String
 listToOutput xs = "[" ++ intercalate "," (map (BC.unpack . encode) xs) ++ "]"
-    
+
+{-| Set up the routing function. -}
 sitemapSite :: Connection -> Site Sitemap (ServerPartT IO Response)
 sitemapSite conn = mkSitePI (runRouteT (siteRoute conn)) 
 
+{-| Entry point. Connects to the database and passes the connection to the
+routing function. -}
 main :: IO()
 main = do
     conn <- open "data/np-weather.db"
