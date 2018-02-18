@@ -24,11 +24,11 @@ main = do
   simpleHTTP nullConf $  do
     setHeaderM "Content-Type" "application/json"
     msum [
-      dirs "weather/date" $ do method [GET, POST]
-                               path $ \d -> dayHandler d conn
-      , dirs "weather/date" $ do method PUT
-                                 path $ \d -> path $ \t -> dayPutHandler d t conn
-      , dirs "weather/range" $ path $ \d1 -> path $ \d2 -> rangeHandler d1 d2 conn
-      , dirs "weather/max" $ path $ \d1 -> path $ \d2   -> maxHandler d1 d2 conn
+      dirs "weather/date"    $ do method [GET, POST]
+                                  path $ \d -> dayHandler d conn
+      , dirs "weather/date"  $ do method PUT
+                                  path $ \d -> path $ \t             -> dayPutHandler d t conn
+      , dirs "weather/range" $ path $ \d1 -> path $ \d2              -> rangeHandler d1 d2 conn
+      , dirs "weather/max"   $ path $ \d1 -> path $ \d2              -> maxHandler d1 d2 conn
       , dirs "weather/above" $ path $ \d1 -> path $ \d2 -> path $ \t -> aboveHandler d1 d2 t conn
       ]

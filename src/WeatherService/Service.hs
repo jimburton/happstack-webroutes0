@@ -99,10 +99,10 @@ rangeHandler d1 d2 conn = do
 {-| Handle reuests for max temperature between two dates. -}
 maxHandler :: Text -> Text -> Connection -> ServerPart Response
 maxHandler d1 d2 conn = do
-  r <- liftIO (queryNamed conn "SELECT MAX(the_date), temperature \
+  r <- liftIO (queryNamed conn " SELECT the_date, MAX(temperature) \
                                \ FROM  weather \
                                \ WHERE the_date >= :d1 \
-                               \ AND   the_date <= :d2" [":d1" := d1, ":d2" := d2] :: IO [WeatherField])
+                               \ AND   the_date <= :d2 " [":d1" := d1, ":d2" := d2] :: IO [WeatherField])
   liftIO $ debugM "Date Query" (listToOutput r) -- ^ NB example of how to output debug messages
   case r of
     [] -> notFoundHandler
