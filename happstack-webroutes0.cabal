@@ -22,57 +22,39 @@ build-type:          Simple
 extra-source-files:  ChangeLog.md, README.md
 cabal-version:       >=1.10
 
-executable happstack-webroutes0
+executable haskell-webservice
   main-is:             Main.hs
-  -- other-modules:       
+  other-modules:       WeatherService.Service
   other-extensions:    OverloadedStrings
                      , FlexibleContexts
                      , TypeFamilies
                      , QuasiQuotes
                      , TemplateHaskell
-                      
+                     , DeriveGeneric
   build-depends:       base >=4.9
+                     , bytestring
+                     , aeson
+                     , sqlite-simple
+                     , hslogger
                      , happstack-server
                      , text
-                     , hamlet
-                     , shakespeare
-                     , shakespeare-css
-                     , web-routes
-                     , web-routes-happstack
-                     , web-routes-th
-                     
   hs-source-dirs:      src
   default-language:    Haskell2010
 
-executable weather-service
-  main-is:             Main.hs
-  -- other-modules:       
-  other-extensions:    OverloadedStrings
-                     , FlexibleContexts
-                     , TypeFamilies
-                     , QuasiQuotes
-                     , TemplateHaskell
-                      
-  build-depends:       base >=4.9
-                     , happstack-server
-                     , text
-                     , aeson
-                     , bytestring
-                     , sqlite-simple
-                     , web-routes
-                     , web-routes-happstack
-                     , web-routes-th
-                     , hslogger
-                     
-  hs-source-dirs:      src/WebService
-  default-language:    Haskell2010
-  
 test-suite test-webservice
     type:            exitcode-stdio-1.0
     main-is:         Main.hs
-    hs-source-dirs:  tests/WebService
+    other-modules:   WeatherService.Service
+    other-extensions:    OverloadedStrings
+    hs-source-dirs:  tests, src
     build-depends:   base
                    , random
                    , tasty
                    , http-test
+                   , aeson
+                   , bytestring
+                   , hslogger
+                   , sqlite-simple
+                   , happstack-server
+                   , text
     default-language:    Haskell2010

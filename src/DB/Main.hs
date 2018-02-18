@@ -24,20 +24,14 @@ main = do
   conn <- open "data/np-weather.db"
   execute_ conn "CREATE TABLE IF NOT EXISTS weather (id INTEGER PRIMARY KEY, the_date TEXT, temperature REAL)"
   populateDB conn
-  --execute conn "INSERT INTO weather (the_date, temperature) VALUES (?,?)" (WeatherField "2018-02-20" (-20.5))
-  --execute conn "INSERT INTO weather (id, str) VALUES (?,?)" (TestField 13 "test string 3")
-  --rowId <- lastInsertRowId conn
-  --executeNamed conn "UPDATE test SET str = :str WHERE id = :id" [":str" := ("updated str" :: T.Text), ":id" := rowId]
   r <- query_ conn "SELECT the_date, temperature FROM weather" :: IO [WeatherField]
   mapM_ print r
-  --execute conn "DELETE FROM test WHERE id = ?" (Only rowId)
   close conn
 
 populateDB conn = do
   ls <- fmap lines $ readFile "data/weather.txt"
   mapM_ (\l -> do let (x:xs) = splitOn "]" (tail l)
                       num = (read (dropWhile isSpace (concat xs)))::Float
-                  --putStrLn (dropWhile isSpace (concat xs))) ls
                   execute conn "INSERT INTO weather (the_date, temperature) VALUES (?,?)" (WeatherField (T.pack x) num)) ls
         
 
