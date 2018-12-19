@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings, FlexibleContexts, TypeFamilies, QuasiQuotes, TemplateHaskell #-}
 
--- Happstack + Shakespeare demo from Tazjin's blog https://tazj.in/en/1335123720
+-- Happstack + WebRoutes + Shakespeare demo from Tazjin's blog https://tazj.in/en/1335123720
 
 module Main where
 
